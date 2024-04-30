@@ -1,0 +1,67 @@
+<div class="container">
+    <div class="IMEI" id="imeiSection">
+        <h1>{{title}}</h1>
+        <p>{{message}}</p>
+
+        <form id="imeiForm" action="/submit" method="POST">
+            <label for="imei">Digite su IMEI:</label>
+            <input type="text" id="imei" name="imei" required>
+            <button type="submit">Enviar</button>
+        </form>
+
+        {{#if marca}}
+            <p>Marca: {{marca}}</p>
+            <p>Modelo: {{modelo}}</p>
+            <p>Estado: {{estado}}</p>
+        {{/if}}
+    </div>
+
+    <div class="omv" id="omvSection" style="display: none;">
+        <h2>OMV</h2>
+        <p>Eres {{omv}} de {{compania}}</p>
+    </div>
+
+    <div class="abonado" id="abonadoSection" style="display: none;">
+        <h2>Digite el número de abonado</h2>
+        <form id="abonadoForm" action="/submit-abonado" method="POST">
+            <label for="abonado">Número de abonado:</label>
+            <input type="text" id="abonado" name="abonado" required>
+            <button type="submit">Enviar</button>
+        </form>
+
+        {{#if vigencia}}
+            <p>Plan: {{vigencia}}</p>
+            <p>Contraseña: {{contraseña}}</p>
+        {{/if}}
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const imeiForm = document.getElementById("imeiForm");
+        const omvSection = document.getElementById("omvSection");
+        const abonadoSection = document.getElementById("abonadoSection");
+
+        imeiForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Simulando datos recibidos del servidor
+            const marca = "Samsung";
+            const modelo = "Galaxy S10";
+            const estado = "Activo";
+            const omv = "OMV Ejemplo";
+            const compania = "Compañía Ejemplo";
+
+            // Mostrar la sección de OMV
+            document.getElementById("imeiSection").style.display = "none";
+            omvSection.style.display = "block";
+
+            // Mostrar la sección de abonado (simulación)
+            // En un entorno real, deberías recibir estos datos del servidor
+            abonadoSection.style.display = "block";
+
+            // Simulando datos recibidos del servidor para la sección de abonado
+            const vigencia = "Plan Ejemplo";
+            const contraseña = "Contraseña Ejemplo";
+        });
+    });
+</script>
