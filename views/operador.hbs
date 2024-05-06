@@ -1,0 +1,28 @@
+<div class="container">
+    <h1>Bienvenido al proveedor {{PROVEEDOR}} OMV {{OMV}} LAC {{LAC}}</h1>
+    <div class="abonado">
+        <p>Número de Abonado: {{numeroAbonado}}</p>
+    </div>
+</div>
+
+{{#if operador1}}
+<div class="container">
+    <h2>Ingrese el operador u OMV:</h2>
+    <form action="/operador" method="POST">
+        <label for="operador">Operador/OMV:</label>
+        <input type="text" id="operador" name="omv" required>
+        <button type="submit">Enviar</button>
+    </form>
+{{/if}}
+
+    {{#if pedirRegion}}
+        <div class="container">
+        <!-- Formulario para pedir la región -->
+        <form action="/operador/region" method="POST">
+            <label for="region">Región:</label>
+            <input type="text" id="region1" name="region" required>
+            <button type="submit">Enviar</button>
+        </form>
+        </div>
+    {{/if}}
+</div>

@@ -1,57 +1,134 @@
-var express = require('express');
-var router = express.Router();
-var csv=require('csvtojson');
-/* GET home page. */
+const express = require('express');
+const router = express.Router();
+const csv = require('csvtojson');
+const fs = require('fs');
 
-// Ruta GET para la página inicial
-router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Bienvenido', message: 'Digite su IMEI' });
+
+// Definir variables globales en index.js
+global.PROVEEDOR = 'movistar';
+global.OMV = 'virgin mobile';
+global.LAC = 1832;
+global.REGION = 7;
+global.numero = '';
+
+router.get('/', (req, res) => {
+    res.render('index.hbs', {
+        PROVEEDOR: PROVEEDOR,
+        OMV: OMV,
+        LAC: LAC
+    });
 });
 
+const jsonFilePath = './public/csv/datos.json';
 
-// Ruta POST para procesar el formulario
-router.post('/submit', function(req, res, next) {
-  // Obtener el IMEI enviado desde el formulario
-  const imei = req.body.imei;
+// Función para leer el archivo CSV y convertirlo a JSON
+function leerArchivoJSON() {
+    try {
+        const jsonData = fs.readFileSync(jsonFilePath, 'utf8');
+        return JSON.parse(jsonData);
+    } catch (error) {
+        console.error('Error al leer el archivo JSON:', error);
+        return [];
+    }
+}
 
-  // Leer el archivo CSV y buscar el IMEI
-  csv()
-      .fromFile('ruta/al/archivo.csv') // Reemplaza 'ruta/al/archivo.csv' con la ruta real de tu archivo CSV
-      .then((jsonObj) => {
-        // Buscar la fila correspondiente al IMEI
-        const rowData = jsonObj.find(row => row.IMEI === imei);
+leerArchivoJSON()
 
-        if (rowData) {
-          // Si se encuentra la fila, extraer los datos relevantes
-          const marca = rowData.Marca;
-          const modelo = rowData.Modelo;
-          const estado = rowData.Estado;
+router.post('/submit-abonado', async (req, res) => {
+    const numeroAbonado = req.body.abonado;
+    numero = numeroAbonado;
+    try {
+        // Leer el archivo CSV y convertirlo a JSON utilizando la función existente
+        const abonados = await leerArchivoJSON();
 
-          // Renderizar la vista con los datos obtenidos
-          res.render('index', {
-            title: 'Bienvenido',
-            message: 'Digite su IMEI',
-            marca: marca,
-            modelo: modelo,
-            estado: estado
-          });
+        // Buscar el número de abonado en el JSON obtenido
+        const abonadoEncontrado = abonados.find(abonado => abonado.ABONADO === parseInt(numeroAbonado));
+
+        if (abonadoEncontrado) {
+            // Si el abonado existe, redirigir a la página 'operador'
+            res.redirect(`/operador/${numeroAbonado}`);
         } else {
-          // Si no se encuentra el IMEI en el CSV, mostrar un mensaje de error
-          res.render('index', {
-            title: 'Error',
-            message: 'IMEI no encontrado en el archivo CSV'
-          });
+            // Si el abonado no existe, mostrar un mensaje de error
+            res.render('index.hbs', {
+                PROVEEDOR: PROVEEDOR,
+                OMV: OMV,
+                LAC: LAC,
+                error: 'El número de abonado ingresado no existe. Por favor, inténtalo de nuevo.'
+            });
         }
-      })
-      .catch(err => {
-        // Manejar cualquier error que pueda ocurrir durante la lectura del CSV
-        console.error('Error al leer el archivo CSV:', err);
-        res.render('index', {
-          title: 'Error',
-          message: 'Error al leer el archivo CSV'
+    } catch (error) {
+        console.error('Error al procesar el número de abonado:', error);
+        res.render('index.hbs', {
+            PROVEEDOR: PROVEEDOR,
+            OMV: OMV,
+            LAC: LAC,
+            error: 'Ocurrió un error al procesar el número de abonado. Por favor, inténtalo de nuevo.'
         });
-      });
+    }
 });
 
+router.get('/operador/:numeroAbonado', async (req, res) => {
+    const numeroAbonado = req.params.numeroAbonado;
 
+    var datos = {
+        PROVEEDOR: PROVEEDOR,
+        OMV: OMV,
+        LAC: LAC,
+        numeroAbonado: numeroAbonado,
+        region: REGION
+    };
+    res.render('operador', {
+        operador1: true,
+        PROVEEDOR: PROVEEDOR,
+        OMV: OMV,
+        LAC: LAC,
+        numeroAbonado: numeroAbonado,
+        region: REGION
+    });
+
+});
 module.exports = router;
+
+router.post('/operador', async (req, res) => {
+    // Obtener el operador u OMV ingresado por el
+    // usuario desde el cuerpo de la solicitud POST
+    const omvIngresado = req.body.omv;
+
+    const omvIngresadoLower = omvIngresado.toLowerCase();
+
+    console.log(omvIngresadoLower);
+    var datos = {
+        PROVEEDOR: PROVEEDOR,
+        OMV: OMV,
+        LAC: LAC,
+        region: REGION
+    };
+
+    // Verificar si el operador ingresado es igual al nuestro
+    if (omvIngresadoLower === OMV) {
+        // Si el OMV es el mismo que el nuestro, pedir la región
+        res.render('operador', {
+            PROVEEDOR: PROVEEDOR,
+            OMV: OMV,
+            LAC: LAC,
+            numeroAbonado: numero,
+            pedirRegion: true,
+            operador1: false
+        });
+        const regionIngresado = req.body.region1;
+        if (regionIngresadoLower === REGION) {
+            res.render('operador', {
+                PROVEEDOR: PROVEEDOR,
+                OMV: OMV,
+                LAC: LAC,
+                numeroAbonado: numero,
+                pedirRegion: false,
+                operador1: false,
+                cobertura
+            });
+
+        }
+    }
+
+
+});

@@ -7,6 +7,7 @@ body {
 }
 
 .container {
+  width: 90%;
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
@@ -16,10 +17,10 @@ body {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
-.IMEI, .omv, .abonado {
+.abonado {
   background-color: rgba(255, 255, 255, 0.1);
   padding: 20px;
-  margin-bottom: 20px;
+  margin-top: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
@@ -52,6 +53,10 @@ input[type="text"] {
   color: #fff;
 }
 
-p {
-  margin-bottom: 10px;
+/* Media query para pantallas más pequeñas */
+@media screen and (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 10px;
+  }
 }
